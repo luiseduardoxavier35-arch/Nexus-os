@@ -1,0 +1,29 @@
+name: Build NEXUS OS image
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "recipes/**"
+      - "files/**"
+      - ".github/workflows/build.yml"
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  bluebuild:
+    name: Build NEXUS OS Alpha 0.1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build and publish image
+        uses: blue-build/github-action@v1
+        with:
+          recipe: recipes/recipe.yml
+          registry_token: ${{ github.token }}
+          cosign_private_key: ${{ secrets.COSIGN_PRIVATE_KEY }}
