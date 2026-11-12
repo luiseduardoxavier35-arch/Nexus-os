@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Minimal NEXUS Welcome prototype.
+# This is not a complete TTS integration; it only runs a user-configured command.
+set -euo pipefail
+
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/nexus/welcome.conf"
+[[ -f "$CONFIG" ]] || exit 0
+# shellcheck disable=SC1090
+source "$CONFIG"
+
+[[ "${ENABLED:-0}" == "1" ]] || exit 0
+name="${USER_NAME:-Luiz}"
+tts="${COMMAND_TTS:-}"
+[[ -n "$tts" ]] || exit 0
+
+# Configure COMMAND_TTS only with a trusted local speech command.
+"$tts" "Seja bem-vindo, ${name}!"
