@@ -26,4 +26,5 @@ jobs:
         with:
           recipe: recipes/recipe.yml
           registry_token: ${{ github.token }}
+          pr_event_number: ${{ github.event.number }}
           cosign_private_key: ${{ secrets.COSIGN_PRIVATE_KEY }}
