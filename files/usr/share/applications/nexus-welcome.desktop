@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=NEXUS Welcome (prototype)
+Comment=Optional NEXUS greeting after login
+Exec=/usr/bin/nexus-welcome
+X-KDE-autostart-after=panel
+NoDisplay=true
