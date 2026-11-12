@@ -1,0 +1,10 @@
+---
+# NEXUS OS initial image recipe.
+# This intentionally starts with the Bazzite base and signing module only.
+# Additional modules will be added after validating each build step.
+name: nexus-os
+description: "NEXUS OS Alpha 0.1 — Gaming Edition"
+base-image: ghcr.io/ublue-os/bazzite
+image-version: stable
+modules:
+  - type: signing
