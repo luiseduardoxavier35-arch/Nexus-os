@@ -6,7 +6,8 @@ on:
     paths:
       - "recipes/**"
       - "files/**"
-      - ".github/workflows/build.yml"\n      - ".github/workflows/build-iso.yml"
+      - ".github/workflows/build.yml"
+      - ".github/workflows/build-iso.yml"
 
 permissions:
   contents: read
