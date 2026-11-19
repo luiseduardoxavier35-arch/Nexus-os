@@ -1,10 +1,17 @@
 ---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
 # NEXUS OS initial image recipe.
-# This intentionally starts with the Bazzite base and signing module only.
-# Additional modules will be added after validating each build step.
 name: nexus-os
 description: "NEXUS OS Alpha 0.1 — Gaming Edition"
 base-image: ghcr.io/ublue-os/bazzite
 image-version: stable
 modules:
+  - type: files
+    files:
+      - source: system
+        destination: /
+  - type: script
+    snippets:
+      - chmod 0755 /usr/bin/nexus-emulator-manager
+      - python3 -m py_compile /usr/bin/nexus-emulator-manager
   - type: signing
