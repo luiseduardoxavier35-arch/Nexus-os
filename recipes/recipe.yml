@@ -14,4 +14,5 @@ modules:
     snippets:
       - chmod 0755 /usr/bin/nexus-emulator-manager
       - python3 -m py_compile /usr/bin/nexus-emulator-manager
-  - type: signing
+# Signing is intentionally postponed until Cosign keys are configured
+# securely in GitHub Actions secrets.
