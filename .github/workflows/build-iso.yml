@@ -1,0 +1,68 @@
+name: Build NEXUS OS Live ISO
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Build NEXUS OS image"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build-iso:
+    name: Generate bootable NEXUS OS ISO
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Free runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/hostedtoolcache/CodeQL /usr/local/lib/android
+          df -h /
+
+      - name: Install Podman
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman
+
+      - name: Authenticate to GitHub Container Registry
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GH_TOKEN" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Install BlueBuild CLI
+        run: |
+          sudo podman run --pull always --rm ghcr.io/blue-build/cli:latest-installer | sudo bash
+          bluebuild --version
+
+      - name: Generate Live ISO from published NEXUS image
+        run: |
+          sudo bluebuild generate-iso \
+            --iso-name nexus-os-alpha-0.1-live.iso \
+            image ghcr.io/luiseduardoxavier35-arch/nexus-os:latest
+
+      - name: Verify ISO and create checksum
+        run: |
+          mkdir -p output
+          ISO_PATH="$(find . -maxdepth 2 -type f -name 'nexus-os-alpha-0.1-live.iso' -print -quit)"
+          test -n "$ISO_PATH"
+          mv "$ISO_PATH" output/
+          test -s output/nexus-os-alpha-0.1-live.iso
+          cd output
+          sha256sum nexus-os-alpha-0.1-live.iso | tee nexus-os-alpha-0.1-live.iso.sha256
+          ls -lh
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-os-alpha-0.1-live-iso
+          path: output/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
