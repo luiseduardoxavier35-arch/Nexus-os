@@ -66,3 +66,12 @@ NEXUS/
 ├── Covers/
 └── Library/
 ```
+
+
+### NEXUS Universal Emulator
+- Native system integration through a platform registry, emulator manager and Game Center launch adapters.
+- Initial platform targets: DuckStation (PS1), PCSX2 (PS2), RPCS3 (PS3), shadPS4 (PS4, experimental), xemu (original Xbox), and Xenia (Xbox 360, experimental pending Linux build validation).
+- Xbox One and Xbox Series X|S remain future/unsupported targets until a mature general-purpose emulator exists.
+- Centralized detection, installation/update policy, per-emulator configuration, controller integration, saves and per-game compatibility metadata.
+- Do not bundle copyrighted games, console firmware, BIOS or keys. Users supply legally obtained files.
+- See [EMULATION.md](EMULATION.md) for the implementation plan and MVP scope.
