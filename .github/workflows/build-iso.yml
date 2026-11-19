@@ -2,19 +2,22 @@ name: Build NEXUS OS Live ISO
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-iso.yml"
   workflow_run:
     workflows: ["Build NEXUS OS image"]
     types: [completed]
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
   packages: read
 
 jobs:
   build-iso:
-    name: Generate bootable NEXUS OS ISO
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    name: Generate and publish NEXUS OS Live ISO
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
@@ -47,7 +50,7 @@ jobs:
             --iso-name nexus-os-alpha-0.1-live.iso \
             image ghcr.io/luiseduardoxavier35-arch/nexus-os:latest
 
-      - name: Verify ISO and create checksum
+      - name: Verify ISO, checksum and split for reliable downloads
         run: |
           mkdir -p output
           ISO_PATH="$(find . -maxdepth 2 -type f -name 'nexus-os-alpha-0.1-live.iso' -print -quit)"
@@ -56,6 +59,7 @@ jobs:
           test -s output/nexus-os-alpha-0.1-live.iso
           cd output
           sha256sum nexus-os-alpha-0.1-live.iso | tee nexus-os-alpha-0.1-live.iso.sha256
+          split -b 1800M -d -a 2 nexus-os-alpha-0.1-live.iso nexus-os-alpha-0.1-live.iso.part
           ls -lh
 
       - name: Upload ISO artifact
@@ -66,3 +70,21 @@ jobs:
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+
+      - name: Publish downloadable release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nexus-os-alpha-0.1-${{ github.run_id }}
+          name: NEXUS OS Alpha 0.1 — Live ISO
+          body: |
+            NEXUS OS Alpha 0.1 Live ISO.
+            The ISO is split into parts to respect GitHub's per-file release asset size limit.
+            Download every .part file into the same folder and join them in numeric order.
+            Windows: copy /b nexus-os-alpha-0.1-live.iso.part00+nexus-os-alpha-0.1-live.iso.part01+nexus-os-alpha-0.1-live.iso.part02 nexus-os-alpha-0.1-live.iso
+            Linux: cat nexus-os-alpha-0.1-live.iso.part* > nexus-os-alpha-0.1-live.iso
+            Verify with the provided SHA-256 file.
+          files: |
+            output/nexus-os-alpha-0.1-live.iso.part*
+            output/nexus-os-alpha-0.1-live.iso.sha256
+          fail_on_unmatched_files: true
+          make_latest: true
