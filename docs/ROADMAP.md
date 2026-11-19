@@ -23,6 +23,15 @@
 - [ ] Safe Windows installer workflow and isolated prefixes.
 - [ ] Library metadata, covers, shortcuts, logs and uninstall.
 
+## Alpha 0.45 — NEXUS Universal Emulator
+- [x] Define the native emulation architecture and platform registry.
+- [x] Add initial CLI for platform listing and emulator detection.
+- [ ] Package registry and CLI into the BlueBuild image with correct executable permissions.
+- [ ] Add per-emulator launch adapters and safe game scanning.
+- [ ] Integrate emulator status and launch actions into Game Center.
+- [ ] Validate controller, save and compatibility workflows.
+- [ ] Keep PS4 and Xbox 360 experimental; do not claim Xbox One/Series emulation support.
+
 ## Alpha 0.5 — control and polish
 - [ ] NEXUS Control.
 - [ ] Hardware diagnostics and troubleshooting.
