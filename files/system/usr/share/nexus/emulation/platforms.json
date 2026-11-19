@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "name": "NEXUS Universal Emulator",
+  "description": "Catálogo central de plataformas e detecção de emuladores instalados.",
+  "platforms": [
+    {"id":"ps1","name":"PlayStation","generation":"PS1","emulator":"DuckStation","commands":["duckstation","duckstation-qt"],"status":"supported"},
+    {"id":"ps2","name":"PlayStation 2","generation":"PS2","emulator":"PCSX2","commands":["pcsx2"],"status":"supported"},
+    {"id":"ps3","name":"PlayStation 3","generation":"PS3","emulator":"RPCS3","commands":["rpcs3"],"status":"supported"},
+    {"id":"ps4","name":"PlayStation 4","generation":"PS4","emulator":"shadPS4","commands":["shadps4","shadPS4"],"status":"experimental"},
+    {"id":"xbox","name":"Xbox clássico","generation":"Xbox","emulator":"xemu","commands":["xemu"],"status":"supported"},
+    {"id":"xbox360","name":"Xbox 360","generation":"Xbox 360","emulator":"Xenia","commands":["xenia","xenia-canary"],"status":"experimental"},
+    {"id":"xboxone","name":"Xbox One","generation":"Xbox One","emulator":null,"commands":[],"status":"unavailable","note":"Não há emulador geral maduro para esta geração."},
+    {"id":"xboxseries","name":"Xbox Series X|S","generation":"Xbox Series","emulator":null,"commands":[],"status":"unavailable","note":"Não há emulador geral maduro para esta geração."}
+  ]
+}
