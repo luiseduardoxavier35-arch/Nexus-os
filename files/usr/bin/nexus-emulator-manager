@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""NEXUS Universal Emulator — platform and emulator detection (initial MVP)."""
+from __future__ import annotations
+
+import argparse
+import json
+import shutil
+import sys
+from pathlib import Path
+
+DEFAULT_MANIFEST = Path("/usr/share/nexus/emulation/platforms.json")
+
+
+def load_manifest(path: Path) -> dict:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        raise SystemExit(f"Manifesto não encontrado: {path}")
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"Manifesto inválido: {exc}")
+    if data.get("schema_version") != 1 or not isinstance(data.get("platforms"), list):
+        raise SystemExit("Versão ou estrutura do manifesto não suportada.")
+    return data
+
+
+def detect(platform: dict) -> str | None:
+    for command in platform.get("commands", []):
+        found = shutil.which(command)
+        if found:
+            return found
+    return None
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Gerencia o catálogo de emulação do NEXUS OS."
+    )
+    parser.add_argument(
+        "--manifest", type=Path, default=DEFAULT_MANIFEST,
+        help="Caminho alternativo do manifesto de plataformas."
+    )
+    parser.add_argument(
+        "action", choices=("list", "status"),
+        help="list: lista plataformas; status: detecta emuladores instalados."
+    )
+    args = parser.parse_args()
+    data = load_manifest(args.manifest)
+
+    print(f"{data.get('name', 'NEXUS Emulator')} — {data.get('description', '')}")
+    print()
+    for platform in data["platforms"]:
+        binary = detect(platform)
+        declared = platform.get("status", "unknown")
+        if binary:
+            result = f"DETECTADO: {binary}"
+        elif declared == "unavailable":
+            result = "SEM EMULADOR GERAL MADURO"
+        elif declared == "experimental":
+            result = "NÃO DETECTADO (suporte experimental)"
+        else:
+            result = "NÃO INSTALADO"
+        print(f"[{platform['id']}] {platform['name']} — {platform.get('emulator') or 'Emulador não definido'}")
+        if args.action == "status":
+            print(f"    {result}")
+        note = platform.get("note")
+        if note:
+            print(f"    Observação: {note}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
